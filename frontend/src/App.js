@@ -1,4 +1,4 @@
-// Enhanced Landing Page Component
+// Enhanced Landing Page Component (Fixed for Vercel)
 const LandingPage = () => {
   const { login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -40,342 +40,182 @@ const LandingPage = () => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: '#f8fafc' }}>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-purple-900">
       {/* Enhanced Hero Section */}
-      <div style={{ 
-        position: 'relative',
-        minHeight: '100vh',
-        background: `linear-gradient(135deg, rgba(30, 64, 175, 0.95) 0%, rgba(67, 56, 202, 0.9) 100%), url('https://images.unsplash.com/photo-1595880961482-c68f6456a921?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Nzh8MHwxfHNlYXJjaHwxfHxjb3VydGhvdXNlJTIwanVzdGljZXxlbnwwfHx8fDE3NTU5MDA3MTF8MA&ixlib=rb-4.1.0&q=85')`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed',
-        display: 'flex',
-        alignItems: 'center'
-      }}>
-        {/* Overlay for better text readability */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          background: 'rgba(30, 64, 175, 0.8)',
-          backgroundImage: 'radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%)'
-        }} />
-        
-        <div style={{ 
-          position: 'relative',
-          zIndex: 2,
-          width: '100%',
-          padding: '0 2rem',
-          maxWidth: '80rem',
-          margin: '0 auto',
-          display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gap: '4rem',
-          alignItems: 'center',
-          minHeight: '100vh'
-        }}>
-          {/* Left Column - Hero Content */}
-          <div style={{ color: 'white' }}>
-            <div style={{ marginBottom: '2rem' }}>
-              <div style={{
-                display: 'inline-block',
-                background: 'rgba(255, 255, 255, 0.2)',
-                padding: '0.5rem 1rem',
-                borderRadius: '2rem',
-                fontSize: '0.875rem',
-                fontWeight: '500',
-                marginBottom: '1.5rem',
-                border: '1px solid rgba(255, 255, 255, 0.3)'
-              }}>
-                ⚖️ JBCC Approved Training Platform
-              </div>
-              
-              <h1 style={{ 
-                fontSize: '4rem', 
-                fontWeight: 'bold', 
-                marginBottom: '1.5rem',
-                lineHeight: '1.1',
-                background: 'linear-gradient(135deg, #ffffff 0%, #93c5fd 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text'
-              }}>
-                Texas Process Server
-                <br />
-                <span style={{ color: '#93c5fd' }}>Certification Training</span>
-              </h1>
-              
-              <p style={{ 
-                fontSize: '1.25rem', 
-                marginBottom: '2.5rem', 
-                lineHeight: '1.6',
-                color: 'rgba(255, 255, 255, 0.9)'
-              }}>
-                Get JBCC approved certification with our comprehensive training program. 
-                Complete your initial certification or renewal requirements with expert-led courses.
-              </p>
-            </div>
-
-            {/* Feature Badges */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
-              gap: '1rem',
-              marginBottom: '3rem' 
-            }}>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                padding: '1rem',
-                borderRadius: '1rem',
-                textAlign: 'center',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>📜</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: '600' }}>JBCC Approved</div>
-              </div>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                padding: '1rem',
-                borderRadius: '1rem',
-                textAlign: 'center',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>⏱️</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: '600' }}>7-Hour Initial</div>
-              </div>
-              <div style={{
-                background: 'rgba(255, 255, 255, 0.15)',
-                padding: '1rem',
-                borderRadius: '1rem',
-                textAlign: 'center',
-                backdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.2)'
-              }}>
-                <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>🔄</div>
-                <div style={{ fontSize: '0.875rem', fontWeight: '600' }}>8-Hour Renewal</div>
-              </div>
-            </div>
-
-            {/* Stats */}
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: 'repeat(3, 1fr)', 
-              gap: '2rem' 
-            }}>
-              <div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#93c5fd' }}>1000+</div>
-                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)' }}>Certified Servers</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#93c5fd' }}>98%</div>
-                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)' }}>Pass Rate</div>
-              </div>
-              <div>
-                <div style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#93c5fd' }}>24/7</div>
-                <div style={{ fontSize: '0.875rem', color: 'rgba(255, 255, 255, 0.8)' }}>Support</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column - Enhanced Auth Form */}
-          <div style={{ display: 'flex', justifyContent: 'center' }}>
-            <div style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              borderRadius: '1.5rem',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-              padding: '2.5rem',
-              width: '100%',
-              maxWidth: '28rem',
-              backdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.2)'
-            }}>
-              <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                <div style={{ 
-                  width: '4rem', 
-                  height: '4rem', 
-                  background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
-                  borderRadius: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 1rem',
-                  fontSize: '1.5rem'
-                }}>⚖️</div>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1f2937' }}>
-                  {isLogin ? 'Welcome Back' : 'Get Started'}
-                </h3>
-                <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                  {isLogin 
-                    ? 'Access your training dashboard' 
-                    : 'Start your certification journey today'
-                  }
+      <div className="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            
+            {/* Left Column - Hero Content */}
+            <div className="text-white space-y-8">
+              <div className="space-y-6">
+                <div className="inline-flex items-center px-4 py-2 rounded-full bg-white bg-opacity-20 text-sm font-medium">
+                  <span className="mr-2">⚖️</span>
+                  JBCC Approved Training Platform
+                </div>
+                
+                <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+                  <span className="block">Texas Process Server</span>
+                  <span className="block text-blue-300">Certification Training</span>
+                </h1>
+                
+                <p className="text-xl text-blue-100 leading-relaxed max-w-lg">
+                  Get JBCC approved certification with our comprehensive training program. 
+                  Complete your initial certification or renewal requirements with expert-led courses.
                 </p>
               </div>
 
-              {error && (
-                <div style={{
-                  background: '#fef2f2',
-                  border: '1px solid #fecaca',
-                  borderRadius: '0.75rem',
-                  padding: '1rem',
-                  marginBottom: '1rem'
-                }}>
-                  <p style={{ color: '#dc2626', margin: 0, fontSize: '0.875rem' }}>{error}</p>
+              {/* Feature Badges */}
+              <div className="grid grid-cols-3 gap-4">
+                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white border-opacity-20">
+                  <div className="text-2xl mb-2">📜</div>
+                  <div className="text-sm font-semibold">JBCC Approved</div>
                 </div>
-              )}
+                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white border-opacity-20">
+                  <div className="text-2xl mb-2">⏱️</div>
+                  <div className="text-sm font-semibold">7-Hour Initial</div>
+                </div>
+                <div className="bg-white bg-opacity-15 backdrop-blur-sm rounded-2xl p-4 text-center border border-white border-opacity-20">
+                  <div className="text-2xl mb-2">🔄</div>
+                  <div className="text-sm font-semibold">8-Hour Renewal</div>
+                </div>
+              </div>
 
-              <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-                {!isLogin && (
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
-                        First Name
-                      </label>
-                      <input
-                        name="first_name"
-                        type="text"
-                        required={!isLogin}
-                        value={formData.first_name}
-                        onChange={handleInputChange}
-                        style={{
-                          width: '100%',
-                          padding: '0.75rem',
-                          border: '1.5px solid #e5e7eb',
-                          borderRadius: '0.75rem',
-                          fontSize: '0.875rem',
-                          transition: 'all 0.2s',
-                          outline: 'none'
-                        }}
-                        onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                        onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                      />
-                    </div>
-                    <div>
-                      <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
-                        Last Name
-                      </label>
-                      <input
-                        name="last_name"
-                        type="text"
-                        required={!isLogin}
-                        value={formData.last_name}
-                        onChange={handleInputChange}
-                        style={{
-                          width: '100%',
-                          padding: '0.75rem',
-                          border: '1.5px solid #e5e7eb',
-                          borderRadius: '0.75rem',
-                          fontSize: '0.875rem',
-                          transition: 'all 0.2s',
-                          outline: 'none'
-                        }}
-                        onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                        onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                      />
-                    </div>
+              {/* Stats */}
+              <div className="grid grid-cols-3 gap-8">
+                <div>
+                  <div className="text-3xl font-bold text-blue-300">1000+</div>
+                  <div className="text-sm text-blue-200">Certified Servers</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-blue-300">98%</div>
+                  <div className="text-sm text-blue-200">Pass Rate</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-blue-300">24/7</div>
+                  <div className="text-sm text-blue-200">Support</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column - Enhanced Auth Form */}
+            <div className="flex justify-center">
+              <div className="bg-white bg-opacity-95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 w-full max-w-md border border-white border-opacity-20">
+                <div className="text-center mb-8">
+                  <div className="w-16 h-16 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl">
+                    ⚖️
+                  </div>
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                    {isLogin ? 'Welcome Back' : 'Get Started'}
+                  </h3>
+                  <p className="text-gray-600">
+                    {isLogin 
+                      ? 'Access your training dashboard' 
+                      : 'Start your certification journey today'
+                    }
+                  </p>
+                </div>
+
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+                    <p className="text-red-600 text-sm">{error}</p>
                   </div>
                 )}
-                
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
-                    Email Address
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1.5px solid #e5e7eb',
-                      borderRadius: '0.75rem',
-                      fontSize: '0.875rem',
-                      transition: 'all 0.2s',
-                      outline: 'none'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                  />
-                </div>
-                
-                <div>
-                  <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.875rem', fontWeight: '600', color: '#374151' }}>
-                    Password
-                  </label>
-                  <input
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    style={{
-                      width: '100%',
-                      padding: '0.75rem',
-                      border: '1.5px solid #e5e7eb',
-                      borderRadius: '0.75rem',
-                      fontSize: '0.875rem',
-                      transition: 'all 0.2s',
-                      outline: 'none'
-                    }}
-                    onFocus={(e) => e.target.style.borderColor = '#3b82f6'}
-                    onBlur={(e) => e.target.style.borderColor = '#e5e7eb'}
-                  />
-                </div>
 
-                <button 
-                  type="submit" 
-                  disabled={loading}
-                  style={{
-                    width: '100%',
-                    padding: '0.875rem',
-                    background: loading ? '#9ca3af' : 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '0.75rem',
-                    fontWeight: '600',
-                    fontSize: '0.875rem',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    transition: 'all 0.2s',
-                    boxShadow: loading ? 'none' : '0 4px 12px rgba(59, 130, 246, 0.4)'
-                  }}
-                  onMouseOver={(e) => !loading && (e.target.style.transform = 'translateY(-1px)')}
-                  onMouseOut={(e) => !loading && (e.target.style.transform = 'translateY(0)')}
-                >
-                  {loading ? '⏳ Please wait...' : (isLogin ? '🚀 Sign In' : '✨ Create Account')}
-                </button>
-              </form>
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  {!isLogin && (
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          First Name
+                        </label>
+                        <input
+                          name="first_name"
+                          type="text"
+                          required={!isLogin}
+                          value={formData.first_name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          Last Name
+                        </label>
+                        <input
+                          name="last_name"
+                          type="text"
+                          required={!isLogin}
+                          value={formData.last_name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Email Address
+                    </label>
+                    <input
+                      name="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Password
+                    </label>
+                    <input
+                      name="password"
+                      type="password"
+                      required
+                      value={formData.password}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors"
+                    />
+                  </div>
 
-              <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-                <button
-                  onClick={() => {
-                    setIsLogin(!isLogin);
-                    setError('');
-                    setFormData({
-                      email: '',
-                      password: '',
-                      first_name: '',
-                      last_name: '',
-                      phone: ''
-                    });
-                  }}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#3b82f6',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    fontSize: '0.875rem',
-                    fontWeight: '500'
-                  }}
-                >
-                  {isLogin 
-                    ? "Don't have an account? Sign up →" 
-                    : "Already have an account? Sign in →"
-                  }
-                </button>
+                  <button 
+                    type="submit" 
+                    disabled={loading}
+                    className={`w-full py-3 rounded-xl font-semibold transition-all ${
+                      loading 
+                        ? 'bg-gray-400 cursor-not-allowed' 
+                        : 'bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 transform hover:scale-105'
+                    } text-white shadow-lg`}
+                  >
+                    {loading ? '⏳ Please wait...' : (isLogin ? '🚀 Sign In' : '✨ Create Account')}
+                  </button>
+                </form>
+
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => {
+                      setIsLogin(!isLogin);
+                      setError('');
+                      setFormData({
+                        email: '',
+                        password: '',
+                        first_name: '',
+                        last_name: '',
+                        phone: ''
+                      });
+                    }}
+                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                  >
+                    {isLogin 
+                      ? "Don't have an account? Sign up →" 
+                      : "Already have an account? Sign in →"
+                    }
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -383,72 +223,48 @@ const LandingPage = () => {
       </div>
 
       {/* Features Section */}
-      <div style={{ padding: '6rem 2rem', background: 'white' }}>
-        <div style={{ maxWidth: '80rem', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
+      <div className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl font-bold text-gray-900 mb-4">
             Why Choose Our Platform?
           </h2>
-          <p style={{ fontSize: '1.125rem', color: '#6b7280', marginBottom: '4rem', maxWidth: '48rem', margin: '0 auto 4rem' }}>
+          <p className="text-xl text-gray-600 mb-16 max-w-3xl mx-auto">
             Professional certification training designed specifically for Texas Process Servers
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '3rem' }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '5rem',
-                height: '5rem',
-                background: 'linear-gradient(135deg, #3b82f6 0%, #1e40af 100%)',
-                borderRadius: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '2rem'
-              }}>📚</div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-blue-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                📚
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Expert Content
               </h3>
-              <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
+              <p className="text-gray-600 leading-relaxed">
                 JBCC approved curriculum designed by legal experts with years of experience
               </p>
             </div>
             
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '5rem',
-                height: '5rem',
-                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
-                borderRadius: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '2rem'
-              }}>⚡</div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-green-700 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                ⚡
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Fast Certification
               </h3>
-              <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
+              <p className="text-gray-600 leading-relaxed">
                 Complete your certification quickly with our streamlined online courses
               </p>
             </div>
             
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '5rem',
-                height: '5rem',
-                background: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
-                borderRadius: '1.5rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.5rem',
-                fontSize: '2rem'
-              }}>🏆</div>
-              <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '1rem', color: '#1f2937' }}>
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-r from-purple-600 to-purple-800 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                🏆
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
                 Instant Certificates
               </h3>
-              <p style={{ color: '#6b7280', lineHeight: '1.6' }}>
+              <p className="text-gray-600 leading-relaxed">
                 Download your official JBCC certificate immediately after completion
               </p>
             </div>
