@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+from fastapi import Request
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
 import uuid
@@ -122,6 +124,22 @@ class QuizAttempt(BaseModel):
     attempt_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     passed: bool = False
 
+class PaymentTransaction(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    course_id: str
+    session_id: str
+    amount: float
+    currency: str = "usd"
+    payment_status: str = "pending"
+    metadata: Optional[dict] = None
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class PaymentRequest(BaseModel):
+    course_id: str
+    origin_url: str
+
 # Auth Helper Functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -151,6 +169,12 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return User(**user)
+
+# Course pricing (server-side only for security)
+COURSE_PRICES = {
+    "1": 129.00,  # Initial certification - $129
+    "2": 109.00   # Renewal certification - $109
+}
 
 # Basic routes
 @app.get("/")
@@ -333,6 +357,150 @@ async def get_certificate(enrollment_id: str, current_user: User = Depends(get_c
     
     return certificate_data
 
+# Payment Routes
+@api_router.post("/payment/create-checkout", response_model=dict)
+async def create_checkout_session(
+    payment_request: PaymentRequest,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    # Get course and validate
+    course = await db.course_types.find_one({"id": payment_request.course_id})
+    if not course:
+        raise HTTPException(status_code=404, detail="Course not found")
+    
+    # Get secure server-side price
+    amount = COURSE_PRICES.get(payment_request.course_id)
+    if not amount:
+        raise HTTPException(status_code=400, detail="Course price not configured")
+    
+    try:
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe not configured")
+        
+        host_url = str(request.base_url)
+        webhook_url = f"{host_url}api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        success_url = f"{payment_request.origin_url}?session_id={{CHECKOUT_SESSION_ID}}&payment=success"
+        cancel_url = f"{payment_request.origin_url}?payment=cancelled"
+        
+        checkout_request = CheckoutSessionRequest(
+            amount=amount,
+            currency="usd",
+            success_url=success_url,
+            cancel_url=cancel_url,
+            metadata={
+                "user_id": current_user.id,
+                "course_id": payment_request.course_id,
+                "course_title": course["title"]
+            }
+        )
+        
+        session = await stripe_checkout.create_checkout_session(checkout_request)
+        
+        # Save payment transaction
+        payment_transaction = PaymentTransaction(
+            user_id=current_user.id,
+            course_id=payment_request.course_id,
+            session_id=session.session_id,
+            amount=amount,
+            currency="usd",
+            payment_status="pending"
+        )
+        
+        await db.payment_transactions.insert_one(payment_transaction.dict())
+        
+        return {
+            "checkout_url": session.url,
+            "session_id": session.session_id,
+            "amount": amount,
+            "course_title": course["title"]
+        }
+        
+    except Exception as e:
+        logger.error(f"Stripe checkout error: {e}")
+        raise HTTPException(status_code=500, detail="Payment processing failed")
+
+@api_router.get("/payment/status/{session_id}", response_model=dict)
+async def check_payment_status(session_id: str, current_user: User = Depends(get_current_user)):
+    if not db:
+        raise HTTPException(status_code=500, detail="Database not available")
+    
+    try:
+        # Get payment from database
+        payment = await db.payment_transactions.find_one({
+            "session_id": session_id,
+            "user_id": current_user.id
+        })
+        
+        if not payment:
+            raise HTTPException(status_code=404, detail="Payment not found")
+        
+        # Check with Stripe
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+        status = await stripe_checkout.get_checkout_status(session_id)
+        
+        # Update payment status
+        await db.payment_transactions.update_one(
+            {"session_id": session_id},
+            {"$set": {"payment_status": status.payment_status, "updated_at": datetime.now(timezone.utc)}}
+        )
+        
+        # Create enrollment if payment successful
+        course_enrolled = False
+        if status.payment_status == "paid":
+            existing = await db.enrollments.find_one({
+                "user_id": current_user.id,
+                "course_type_id": payment["course_id"]
+            })
+            
+            if not existing:
+                enrollment = Enrollment(user_id=current_user.id, course_type_id=payment["course_id"])
+                await db.enrollments.insert_one(enrollment.dict())
+                course_enrolled = True
+            else:
+                course_enrolled = True
+        
+        return {
+            "status": status.status,
+            "payment_status": status.payment_status,
+            "amount_total": status.amount_total,
+            "currency": status.currency,
+            "course_enrolled": course_enrolled
+        }
+        
+    except Exception as e:
+        logger.error(f"Payment status error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to check payment status")
+
+@api_router.post("/webhook/stripe")
+async def stripe_webhook(request: Request):
+    try:
+        body = await request.body()
+        stripe_signature = request.headers.get("stripe-signature")
+        
+        stripe_api_key = os.environ.get('STRIPE_API_KEY')
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url="")
+        webhook_response = await stripe_checkout.handle_webhook(body, stripe_signature)
+        
+        if webhook_response.session_id and db:
+            await db.payment_transactions.update_one(
+                {"session_id": webhook_response.session_id},
+                {"$set": {"payment_status": webhook_response.payment_status, "updated_at": datetime.now(timezone.utc)}}
+            )
+        
+        return {"status": "success"}
+        
+    except Exception as e:
+        logger.error(f"Webhook error: {e}")
+        raise HTTPException(status_code=400, detail="Webhook failed")
+        
 # Include router
 app.include_router(api_router)
 
