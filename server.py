@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
-from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
 from fastapi import Request
 from pydantic import BaseModel, Field, EmailStr
 from typing import List, Optional
@@ -126,22 +125,6 @@ class QuizAttempt(BaseModel):
     attempt_date: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     passed: bool = False
 
-class PaymentTransaction(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    user_id: str
-    course_id: str
-    session_id: str
-    amount: float
-    currency: str = "usd"
-    payment_status: str = "pending"
-    metadata: Optional[dict] = None
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
-
-class PaymentRequest(BaseModel):
-    course_id: str
-    origin_url: str
-
 # Auth Helper Functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -171,12 +154,6 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     if user is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return User(**user)
-
-# Course pricing (server-side only for security)
-COURSE_PRICES = {
-    "1": 129.00,  # Initial certification - $129
-    "2": 109.00   # Renewal certification - $109
-}
 
 # Basic routes
 @app.get("/")
@@ -359,16 +336,6 @@ async def get_certificate(enrollment_id: str, current_user: User = Depends(get_c
     
     return certificate_data
 
-# Payment Routes
-@api_router.post("/payment/create-checkout", response_model=dict)
-async def create_checkout_session(
-    payment_request: PaymentRequest,
-    request: Request,
-    current_user: User = Depends(get_current_user)
-):
-    if not db:
-        raise HTTPException(status_code=500, detail="Database not available")
-    
     # Get course and validate
     course = await db.course_types.find_one({"id": payment_request.course_id})
     if not course:
