@@ -368,11 +368,33 @@ const LandingPage = () => {
 };
 
 // Dashboard Component
-const Dashboard = () => {
+  const Dashboard = () => {
   const { user } = useAuth();
   const [courses, setCourses] = useState([]);
   const [myCourses, setMyCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [paymentStatus, setPaymentStatus] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [coursesResponse, myCoursesResponse] = await Promise.all([
+          axios.get(`${API}/courses`),
+          axios.get(`${API}/my-courses`)
+        ]);
+        
+        setCourses(coursesResponse.data);
+        setMyCourses(myCoursesResponse.data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+    handlePaymentReturn(); // Check for payment return
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -404,7 +426,82 @@ const Dashboard = () => {
       console.error('Error enrolling in course:', error);
     }
   };
+  
+  const handlePayForCourse = async (courseId, courseTitle, price) => {
+    try {
+      const originUrl = window.location.origin;
+      
+      const response = await axios.post(`${API}/payment/create-checkout`, {
+        course_id: courseId,
+        origin_url: originUrl
+      });
+      
+      // Redirect to Stripe Checkout
+      if (response.data.checkout_url) {
+        window.location.href = response.data.checkout_url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      alert('Failed to initiate payment. Please try again.');
+    }
+  };
 
+  const checkPaymentStatus = async (sessionId) => {
+    try {
+      const response = await axios.get(`${API}/payment/status/${sessionId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error checking payment status:', error);
+      return null;
+    }
+  };
+
+  const handlePaymentReturn = async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const paymentStatus = urlParams.get('payment');
+    
+    if (sessionId && paymentStatus === 'success') {
+      setPaymentStatus('checking');
+      
+      // Poll payment status
+      let attempts = 0;
+      const maxAttempts = 5;
+      
+      const pollStatus = async () => {
+        if (attempts >= maxAttempts) {
+          setPaymentStatus('timeout');
+          return;
+        }
+        
+        const status = await checkPaymentStatus(sessionId);
+        
+        if (status && status.payment_status === 'paid' && status.course_enrolled) {
+          setPaymentStatus('success');
+          // Refresh courses data
+          const response = await axios.get(`${API}/my-courses`);
+          setMyCourses(response.data);
+          // Clear URL parameters
+          window.history.replaceState({}, document.title, window.location.pathname);
+        } else if (status && status.status === 'expired') {
+          setPaymentStatus('expired');
+        } else {
+          attempts++;
+          setTimeout(pollStatus, 2000); // Poll every 2 seconds
+        }
+      };
+      
+      pollStatus();
+    } else if (paymentStatus === 'cancelled') {
+      setPaymentStatus('cancelled');
+      // Clear URL parameters
+      setTimeout(() => {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        setPaymentStatus(null);
+      }, 3000);
+    }
+  };
+  
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
@@ -435,6 +532,26 @@ const Dashboard = () => {
             Track your progress and manage your certifications
           </p>
         </div>
+
+{/* Payment Status Messages */}
+        {paymentStatus && (
+          <div style={{
+            padding: '1rem',
+            marginBottom: '2rem',
+            borderRadius: '0.375rem',
+            textAlign: 'center',
+            background: paymentStatus === 'success' ? '#dcfce7' : 
+                       paymentStatus === 'checking' ? '#fef3c7' : '#fef2f2',
+            color: paymentStatus === 'success' ? '#166534' : 
+                   paymentStatus === 'checking' ? '#92400e' : '#dc2626'
+          }}>
+            {paymentStatus === 'success' && '✅ Payment successful! You are now enrolled in the course.'}
+            {paymentStatus === 'checking' && '⏳ Processing your payment...'}
+            {paymentStatus === 'cancelled' && '❌ Payment was cancelled.'}
+            {paymentStatus === 'expired' && '⏱️ Payment session expired.'}
+            {paymentStatus === 'timeout' && '⚠️ Payment verification timed out. Please check your enrollments.'}
+          </div>
+        )}
 
         {/* My Courses Section */}
         <div style={{ marginBottom: '3rem' }}>
@@ -599,21 +716,31 @@ const Dashboard = () => {
                     )}
                   </div>
 
+                  <div style={{ marginBottom: '1rem', textAlign: 'center' }}>
+                    <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#059669', marginBottom: '0.5rem' }}>
+                      ${course.id === '1' ? '199' : '149'}
+                    </div>
+                    <div style={{ fontSize: '0.875rem', color: '#6b7280' }}>
+                      {course.id === '1' ? 'Initial Certification' : 'Renewal Course'}
+                    </div>
+                  </div>
+
                   <button 
-                    onClick={() => enrollInCourse(course.id)}
+                    onClick={() => handlePayForCourse(course.id, course.title, course.id === '1' ? 199 : 149)}
                     disabled={isEnrolled}
                     style={{
                       width: '100%',
                       padding: '0.75rem',
-                      background: isEnrolled ? '#9ca3af' : '#3b82f6',
+                      background: isEnrolled ? '#9ca3af' : '#059669',
                       color: 'white',
                       border: 'none',
                       borderRadius: '0.375rem',
                       fontWeight: '500',
-                      cursor: isEnrolled ? 'not-allowed' : 'pointer'
+                      cursor: isEnrolled ? 'not-allowed' : 'pointer',
+                      fontSize: '1rem'
                     }}
                   >
-                    {isEnrolled ? 'Already Enrolled' : 'Enroll Now'}
+                    {isEnrolled ? 'Already Enrolled' : `Pay $${course.id === '1' ? '199' : '149'} & Enroll`}
                   </button>
                 </div>
               );
